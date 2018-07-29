@@ -4,12 +4,12 @@ using UnityEngine;
 
 public class PlayerController : MonoBehaviour
 {
-    public float horizontalVelocityMax = 10f;
     private float horizontalVelocity;
-    public float horizontalAcceleration = 0.5f;
+    public float horizontalAcceleration = 0.9f;
     public float horizontalDamping = 0.2f;
     public float horizontalDampingStopping = 0.2f;
     public float horizontalDampingTurning = 0.2f;
+
     private float moveInput = 0f;
     private bool facingRight = true;
 
@@ -32,31 +32,35 @@ public class PlayerController : MonoBehaviour
     }
 
     void FixedUpdate() {
-        onGround = isOnGround();
+        onGround = IsOnGround();
 
-        move();
+        Move();
     }
 
     void Update () {
-        jump();
+        Jump();
     }
 
-    private bool isOnGround() {
+    // Checks if the player is on ground
+    private bool IsOnGround() {
         return Physics2D.OverlapCircle(groundCheck.position, groundCheckRadius, ground);
     }
 
-    private void move() {
-        moveInput = Input.GetAxis("Horizontal");
+    // Movement controlls
+    private void Move() {
+        moveInput = Input.GetAxisRaw("Horizontal");
+
+        
         horizontalVelocity = rigid2D.velocity.x;
         horizontalVelocity += moveInput;
 
         if (Mathf.Abs(moveInput) < 0.01f) {
-            horizontalVelocity *= Mathf.Pow(1f - horizontalDampingStopping, Time.deltaTime * horizontalVelocityMax);
+            horizontalVelocity *= Mathf.Pow(1f - horizontalDampingStopping, Time.deltaTime * horizontalAcceleration);
         } else if (Mathf.Sign(moveInput) != Mathf.Sign(horizontalVelocity)) {
-            horizontalVelocity *= Mathf.Pow(1f - horizontalDampingTurning, Time.deltaTime * horizontalVelocityMax);
+            horizontalVelocity *= Mathf.Pow(1f - horizontalDampingTurning, Time.deltaTime * horizontalAcceleration);
         } else {
-            horizontalVelocity *= Mathf.Pow(1f - horizontalDamping, horizontalVelocityMax);
-        }
+            horizontalVelocity *= Mathf.Pow(1f - horizontalDamping, Time.deltaTime * horizontalAcceleration);
+        }        
 
         rigid2D.velocity = new Vector2(horizontalVelocity, rigid2D.velocity.y);
 
@@ -67,7 +71,8 @@ public class PlayerController : MonoBehaviour
         }
     }
 
-    private void jump() {
+    // Jump controlls
+    private void Jump() {
         // The player is able to jump nethertheless he is falling from a ledge,
         // if he is in the specified time period, defined in onGroundRememberTime
         onGroundRemember -= Time.deltaTime;
@@ -99,6 +104,7 @@ public class PlayerController : MonoBehaviour
         }
     }
 
+    // Flips the sprite according to the direction the player is facing
     private void Flip() {
         facingRight = !facingRight;
         Vector3 scale = transform.localScale;

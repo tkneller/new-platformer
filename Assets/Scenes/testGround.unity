@@ -313,7 +313,7 @@ Transform:
   m_PrefabInternal: {fileID: 0}
   m_GameObject: {fileID: 640385683}
   m_LocalRotation: {x: 0, y: 0, z: 0, w: 1}
-  m_LocalPosition: {x: 5.59, y: -3.17, z: 0}
+  m_LocalPosition: {x: 9.352, y: -4.67, z: 0}
   m_LocalScale: {x: 1, y: 1, z: 1}
   m_Children: []
   m_Father: {fileID: 0}
@@ -353,10 +353,10 @@ Rigidbody2D:
   m_LinearDrag: 0
   m_AngularDrag: 0.05
   m_GravityScale: 1
-  m_Material: {fileID: 0}
-  m_Interpolate: 0
-  m_SleepingMode: 1
-  m_CollisionDetection: 0
+  m_Material: {fileID: 6200000, guid: 378133e31a98b514bbc3d3feb6561600, type: 2}
+  m_Interpolate: 1
+  m_SleepingMode: 0
+  m_CollisionDetection: 1
   m_Constraints: 4
 --- !u!61 &1266656623
 BoxCollider2D:
@@ -454,14 +454,18 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 082cb63eeec0ec747a7c839d42b55755, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  maxSpeed: 10
+  horizontalAcceleration: 10
+  horizontalDamping: 0.2
+  horizontalDampingStopping: 0.6
+  horizontalDampingTurning: 0.2
   groundCheck: {fileID: 444615345}
   ground:
     serializedVersion: 2
     m_Bits: 512
-  onGroundRememberTime: 0.2
-  jumpForce: 10
-  jumpPressedRememberTime: 0.2
+  onGroundRememberTime: 0.15
+  jumpVelocity: 10
+  cutJumpHeight: 0.5
+  jumpPressedRememberTime: 0.15
 --- !u!1 &1274577323
 GameObject:
   m_ObjectHideFlags: 0
@@ -557,7 +561,7 @@ Transform:
   m_PrefabInternal: {fileID: 0}
   m_GameObject: {fileID: 1274577323}
   m_LocalRotation: {x: 0, y: 0, z: 0, w: 1}
-  m_LocalPosition: {x: 5.54, y: -4.66, z: 0}
+  m_LocalPosition: {x: 4.71, y: -0.83, z: 0}
   m_LocalScale: {x: 1, y: 1, z: 1}
   m_Children: []
   m_Father: {fileID: 0}
@@ -768,7 +772,7 @@ Transform:
   m_PrefabInternal: {fileID: 0}
   m_GameObject: {fileID: 1350628550}
   m_LocalRotation: {x: 0, y: 0, z: 0, w: 1}
-  m_LocalPosition: {x: 10.95, y: 0.16, z: 0}
+  m_LocalPosition: {x: 9.87, y: 0.82, z: 0}
   m_LocalScale: {x: 1, y: 1, z: 1}
   m_Children: []
   m_Father: {fileID: 0}
@@ -869,7 +873,7 @@ Transform:
   m_PrefabInternal: {fileID: 0}
   m_GameObject: {fileID: 1705988468}
   m_LocalRotation: {x: 0, y: 0, z: 0, w: 1}
-  m_LocalPosition: {x: -10.71, y: 1.39, z: 0}
+  m_LocalPosition: {x: -9.78, y: 1.39, z: 0}
   m_LocalScale: {x: 1, y: 1, z: 1}
   m_Children: []
   m_Father: {fileID: 0}
@@ -970,7 +974,7 @@ Transform:
   m_PrefabInternal: {fileID: 0}
   m_GameObject: {fileID: 2047714624}
   m_LocalRotation: {x: 0, y: 0, z: 0, w: 1}
-  m_LocalPosition: {x: -4.39, y: -4.63, z: 0}
+  m_LocalPosition: {x: -3.76, y: -4.67, z: 0}
   m_LocalScale: {x: 1.3125, y: 1, z: 1}
   m_Children: []
   m_Father: {fileID: 0}
