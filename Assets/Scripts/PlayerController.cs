@@ -4,7 +4,12 @@ using UnityEngine;
 
 public class PlayerController : MonoBehaviour
 {
-    public float maxSpeed = 10f;
+    public float horizontalVelocityMax = 10f;
+    private float horizontalVelocity;
+    public float horizontalAcceleration = 0.5f;
+    public float horizontalDamping = 0.2f;
+    public float horizontalDampingStopping = 0.2f;
+    public float horizontalDampingTurning = 0.2f;
     private float moveInput = 0f;
     private bool facingRight = true;
 
@@ -15,14 +20,15 @@ public class PlayerController : MonoBehaviour
     private float onGroundRemember;
     public float onGroundRememberTime = 0.2f;
 
-    public float jumpForce = 10f;
+    public float jumpVelocity = 10f;
+    public float cutJumpHeight = 0.5f; 
     private float jumpPressedRemember;
     public float jumpPressedRememberTime = 0.2f;
 
-    private Rigidbody2D rigid2;
+    private Rigidbody2D rigid2D;
 
 	void Start () {
-        rigid2 = GetComponent<Rigidbody2D>();
+        rigid2D = GetComponent<Rigidbody2D>();
     }
 
     void FixedUpdate() {
@@ -41,7 +47,18 @@ public class PlayerController : MonoBehaviour
 
     private void move() {
         moveInput = Input.GetAxis("Horizontal");
-        rigid2.velocity = new Vector2(moveInput * maxSpeed, rigid2.velocity.y);
+        horizontalVelocity = rigid2D.velocity.x;
+        horizontalVelocity += moveInput;
+
+        if (Mathf.Abs(moveInput) < 0.01f) {
+            horizontalVelocity *= Mathf.Pow(1f - horizontalDampingStopping, Time.deltaTime * horizontalVelocityMax);
+        } else if (Mathf.Sign(moveInput) != Mathf.Sign(horizontalVelocity)) {
+            horizontalVelocity *= Mathf.Pow(1f - horizontalDampingTurning, Time.deltaTime * horizontalVelocityMax);
+        } else {
+            horizontalVelocity *= Mathf.Pow(1f - horizontalDamping, horizontalVelocityMax);
+        }
+
+        rigid2D.velocity = new Vector2(horizontalVelocity, rigid2D.velocity.y);
 
         if (moveInput > 0 && !facingRight) {
             Flip();
@@ -67,10 +84,18 @@ public class PlayerController : MonoBehaviour
             jumpPressedRemember = jumpPressedRememberTime;
         }
 
+        // Determines how high the player will jump depending on how long
+        // the jump button is held down
+        if (Input.GetButtonUp("Jump")) {
+            if (rigid2D.velocity.y > 0) {
+                rigid2D.velocity = new Vector2(rigid2D.velocity.x, rigid2D.velocity.y * cutJumpHeight);
+            }
+        }
+
         if (jumpPressedRemember > 0 && onGroundRemember > 0) {
             onGroundRemember = 0;
             jumpPressedRemember = 0;
-            rigid2.velocity = Vector2.up * jumpForce;
+            rigid2D.velocity = new Vector2(rigid2D.velocity.x, jumpVelocity);
         }
     }
 
