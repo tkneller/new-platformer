@@ -4,11 +4,18 @@ using UnityEngine;
 
 public class PlayerController : MonoBehaviour
 {
+    private float Fr;
+    private float g;
+    private float m;
+    private float y;
+
+    public float horizontalVelocityMax = 10f;
     private float horizontalVelocity;
-    public float horizontalAcceleration = 0.9f;
-    public float horizontalDamping = 0.2f;
-    public float horizontalDampingStopping = 0.2f;
-    public float horizontalDampingTurning = 0.2f;
+    public float horizontalAcceleration = 0.5f;
+    private float time;
+    public float horizontalFriction = 2f;
+    public float horizontalFrictionStopping = 0.2f;
+    public float horizontalFrictionTurning = 0.2f;
 
     private float moveInput = 0f;
     private bool facingRight = true;
@@ -48,9 +55,9 @@ public class PlayerController : MonoBehaviour
 
     // Movement controlls
     private void Move() {
-        moveInput = Input.GetAxisRaw("Horizontal");
+        //moveInput = Input.GetAxisRaw("Horizontal");
 
-        
+        /*
         horizontalVelocity = rigid2D.velocity.x;
         horizontalVelocity += moveInput;
 
@@ -61,6 +68,36 @@ public class PlayerController : MonoBehaviour
         } else {
             horizontalVelocity *= Mathf.Pow(1f - horizontalDamping, Time.deltaTime * horizontalAcceleration);
         }        
+        */
+
+        moveInput = Input.GetAxisRaw("Horizontal");
+
+        /*
+        if (moveInput != 0 && (horizontalVelocity * moveInput) < horizontalVelocityMax) {
+            time = time + Time.deltaTime;
+            horizontalVelocity = ((horizontalAcceleration * (time * moveInput)) + rigid2D.velocity.x);
+        } else if (moveInput != 0 && (horizontalVelocity * moveInput) == horizontalVelocityMax) {
+            horizontalVelocity = ((0 * (time * moveInput)) + rigid2D.velocity.x);      
+        } else {
+            horizontalVelocity = (-1 * (horizontalAcceleration * horizontalFriction)) + rigid2D.velocity.x;
+        }
+        */
+
+        // Movement decreases slowly over time by friction
+        if (moveInput != 0) {
+            time = time + Time.deltaTime;
+            horizontalVelocity = ((horizontalAcceleration * (time * moveInput)) + rigid2D.velocity.x);        
+        } 
+
+        // Negative 
+        if (moveInput == 0 && horizontalVelocity != 0) {
+            horizontalVelocity = ((1 * horizontalFriction * (time * moveInput)) + rigid2D.velocity.x);
+        }
+
+        // Speedcap
+        if (moveInput * horizontalVelocity > horizontalVelocityMax) {
+            horizontalVelocity = moveInput * horizontalVelocityMax;
+        }
 
         rigid2D.velocity = new Vector2(horizontalVelocity, rigid2D.velocity.y);
 

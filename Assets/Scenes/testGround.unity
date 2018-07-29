@@ -124,7 +124,7 @@ GameObject:
   m_Layer: 10
   m_Name: groundCheck
   m_TagString: Untagged
-  m_Icon: {fileID: 5132851093641282708, guid: 0000000000000000d000000000000000, type: 0}
+  m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
   m_StaticEditorFlags: 0
   m_IsActive: 1
@@ -350,7 +350,7 @@ Rigidbody2D:
   m_UseFullKinematicContacts: 0
   m_UseAutoMass: 0
   m_Mass: 1
-  m_LinearDrag: 0
+  m_LinearDrag: 2
   m_AngularDrag: 0.05
   m_GravityScale: 1
   m_Material: {fileID: 6200000, guid: 378133e31a98b514bbc3d3feb6561600, type: 2}
@@ -454,7 +454,8 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 082cb63eeec0ec747a7c839d42b55755, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  horizontalAcceleration: 10
+  horizontalVelocityMax: 15
+  horizontalAcceleration: 0.5
   horizontalDamping: 0.2
   horizontalDampingStopping: 0.6
   horizontalDampingTurning: 0.2
