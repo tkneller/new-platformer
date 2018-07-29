@@ -12,8 +12,12 @@ public class PlayerController : MonoBehaviour
     public Transform groundCheck;
     private float groundCheckRadius = 0.2f;
     public LayerMask ground;
+    private float onGroundRemember;
+    public float onGroundRememberTime = 0.2f;
 
     public float jumpForce = 10f;
+    private float jumpPressedRemember;
+    public float jumpPressedRememberTime = 0.2f;
 
     private Rigidbody2D rigid2;
 
@@ -47,7 +51,25 @@ public class PlayerController : MonoBehaviour
     }
 
     private void jump() {
-        if (onGround && Input.GetButtonDown("Jump")) {
+        // The player is able to jump nethertheless he is falling from a ledge,
+        // if he is in the specified time period, defined in onGroundRememberTime
+        onGroundRemember -= Time.deltaTime;
+
+        if (onGround) {
+            onGroundRemember = onGroundRememberTime;
+        }
+
+        // The player is able to jump nethertheless he is shortly above the ground,
+        // if he is in the specified time period, defined in jumpPressedRememberTime
+        jumpPressedRemember -= Time.deltaTime;
+
+        if (Input.GetButtonDown("Jump")) {
+            jumpPressedRemember = jumpPressedRememberTime;
+        }
+
+        if (jumpPressedRemember > 0 && onGroundRemember > 0) {
+            onGroundRemember = 0;
+            jumpPressedRemember = 0;
             rigid2.velocity = Vector2.up * jumpForce;
         }
     }
