@@ -313,7 +313,7 @@ Transform:
   m_PrefabInternal: {fileID: 0}
   m_GameObject: {fileID: 640385683}
   m_LocalRotation: {x: 0, y: 0, z: 0, w: 1}
-  m_LocalPosition: {x: 9.352, y: -4.67, z: 0}
+  m_LocalPosition: {x: 9.36, y: -4.67, z: 0}
   m_LocalScale: {x: 1, y: 1, z: 1}
   m_Children: []
   m_Father: {fileID: 0}
@@ -456,9 +456,9 @@ MonoBehaviour:
   m_EditorClassIdentifier: 
   horizontalVelocityMax: 15
   horizontalAcceleration: 0.5
-  horizontalDamping: 0.2
-  horizontalDampingStopping: 0.6
-  horizontalDampingTurning: 0.2
+  horizontalFriction: 0.2
+  horizontalFrictionStopping: 0.2
+  horizontalFrictionTurning: 0.2
   groundCheck: {fileID: 444615345}
   ground:
     serializedVersion: 2

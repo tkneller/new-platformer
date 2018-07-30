@@ -9,17 +9,17 @@ public class PlayerController : MonoBehaviour
     private float m;
     private float y;
 
+    private float moveInput = 0f;
+    private bool facingRight = true;
     public float horizontalVelocityMax = 10f;
     private float horizontalVelocity;
     public float horizontalAcceleration = 0.5f;
-    private float time;
     public float horizontalFriction = 2f;
     public float horizontalFrictionStopping = 0.2f;
     public float horizontalFrictionTurning = 0.2f;
-
-    private float moveInput = 0f;
-    private bool facingRight = true;
-
+    private float timeAcceleration = 0;
+    private float timeFriction = 0;
+    
     private bool onGround = false;
     public Transform groundCheck;
     private float groundCheckRadius = 0.2f;
@@ -55,12 +55,7 @@ public class PlayerController : MonoBehaviour
 
     // Movement controlls
     private void Move() {
-        //moveInput = Input.GetAxisRaw("Horizontal");
-
         /*
-        horizontalVelocity = rigid2D.velocity.x;
-        horizontalVelocity += moveInput;
-
         if (Mathf.Abs(moveInput) < 0.01f) {
             horizontalVelocity *= Mathf.Pow(1f - horizontalDampingStopping, Time.deltaTime * horizontalAcceleration);
         } else if (Mathf.Sign(moveInput) != Mathf.Sign(horizontalVelocity)) {
@@ -71,27 +66,13 @@ public class PlayerController : MonoBehaviour
         */
 
         moveInput = Input.GetAxisRaw("Horizontal");
-
-        /*
-        if (moveInput != 0 && (horizontalVelocity * moveInput) < horizontalVelocityMax) {
-            time = time + Time.deltaTime;
-            horizontalVelocity = ((horizontalAcceleration * (time * moveInput)) + rigid2D.velocity.x);
-        } else if (moveInput != 0 && (horizontalVelocity * moveInput) == horizontalVelocityMax) {
-            horizontalVelocity = ((0 * (time * moveInput)) + rigid2D.velocity.x);      
-        } else {
-            horizontalVelocity = (-1 * (horizontalAcceleration * horizontalFriction)) + rigid2D.velocity.x;
-        }
-        */
-
-        // Movement decreases slowly over time by friction
+        
+        // Acceleration
         if (moveInput != 0) {
-            time = time + Time.deltaTime;
-            horizontalVelocity = ((horizontalAcceleration * (time * moveInput)) + rigid2D.velocity.x);        
-        } 
-
-        // Negative 
-        if (moveInput == 0 && horizontalVelocity != 0) {
-            horizontalVelocity = ((1 * horizontalFriction * (time * moveInput)) + rigid2D.velocity.x);
+            timeAcceleration = timeAcceleration + Time.deltaTime;
+            horizontalVelocity = ((horizontalAcceleration * (timeAcceleration * moveInput)) + rigid2D.velocity.x);        
+        } else {
+            timeAcceleration = 0;
         }
 
         // Speedcap
@@ -99,8 +80,32 @@ public class PlayerController : MonoBehaviour
             horizontalVelocity = moveInput * horizontalVelocityMax;
         }
 
+        // Movement decreases slowly over time due to friction if
+        // directional buttons are released
+        if (moveInput == 0 && horizontalVelocity != 0 ) {
+
+            timeFriction = timeFriction + Time.deltaTime;
+
+            if (facingRight) {
+                if (horizontalVelocity <= 0) {
+                    horizontalVelocity = 0;
+                    timeFriction = 0;
+                } else {
+                    horizontalVelocity = -(horizontalFriction * timeFriction) + rigid2D.velocity.x;
+                }
+            } else {
+                if (horizontalVelocity >= 0) {
+                    horizontalVelocity = 0;
+                    timeFriction = 0;
+                } else {
+                    horizontalVelocity = (horizontalFriction * timeFriction) + rigid2D.velocity.x;
+                }
+            } 
+        }
+
         rigid2D.velocity = new Vector2(horizontalVelocity, rigid2D.velocity.y);
 
+        // Flip sprite according to the direction the player is facing
         if (moveInput > 0 && !facingRight) {
             Flip();
         } else if (moveInput < 0 && facingRight) {
