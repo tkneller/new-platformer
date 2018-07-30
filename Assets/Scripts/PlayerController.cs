@@ -4,21 +4,16 @@ using UnityEngine;
 
 public class PlayerController : MonoBehaviour
 {
-    private float Fr;
-    private float g;
-    private float m;
-    private float y;
-
-    private float moveInput = 0f;
+    private float moveInput = 0;
     private bool facingRight = true;
     public float horizontalVelocityMax = 10f;
     private float horizontalVelocity;
     public float horizontalAcceleration = 0.5f;
-    public float horizontalFriction = 2f;
+    private float horizontalAccelerationTime = 0;
+    public float horizontalFriction = 0.2f;
+    private float horizontalFrictionTime = 0;
     public float horizontalFrictionStopping = 0.2f;
     public float horizontalFrictionTurning = 0.2f;
-    private float timeAcceleration = 0;
-    private float timeFriction = 0;
     
     private bool onGround = false;
     public Transform groundCheck;
@@ -55,24 +50,14 @@ public class PlayerController : MonoBehaviour
 
     // Movement controlls
     private void Move() {
-        /*
-        if (Mathf.Abs(moveInput) < 0.01f) {
-            horizontalVelocity *= Mathf.Pow(1f - horizontalDampingStopping, Time.deltaTime * horizontalAcceleration);
-        } else if (Mathf.Sign(moveInput) != Mathf.Sign(horizontalVelocity)) {
-            horizontalVelocity *= Mathf.Pow(1f - horizontalDampingTurning, Time.deltaTime * horizontalAcceleration);
-        } else {
-            horizontalVelocity *= Mathf.Pow(1f - horizontalDamping, Time.deltaTime * horizontalAcceleration);
-        }        
-        */
-
         moveInput = Input.GetAxisRaw("Horizontal");
         
         // Acceleration
         if (moveInput != 0) {
-            timeAcceleration = timeAcceleration + Time.deltaTime;
-            horizontalVelocity = ((horizontalAcceleration * (timeAcceleration * moveInput)) + rigid2D.velocity.x);        
+            horizontalAccelerationTime = horizontalAccelerationTime + Time.deltaTime;
+            horizontalVelocity = (((horizontalAcceleration - horizontalFriction) * (horizontalAccelerationTime * moveInput)) + rigid2D.velocity.x);        
         } else {
-            timeAcceleration = 0;
+            horizontalAccelerationTime = 0;
         }
 
         // Speedcap
@@ -84,21 +69,21 @@ public class PlayerController : MonoBehaviour
         // directional buttons are released
         if (moveInput == 0 && horizontalVelocity != 0 ) {
 
-            timeFriction = timeFriction + Time.deltaTime;
+            horizontalFrictionTime = horizontalFrictionTime + Time.deltaTime;
 
             if (facingRight) {
                 if (horizontalVelocity <= 0) {
                     horizontalVelocity = 0;
-                    timeFriction = 0;
+                    horizontalFrictionTime = 0;
                 } else {
-                    horizontalVelocity = -(horizontalFriction * timeFriction) + rigid2D.velocity.x;
+                    horizontalVelocity = -(horizontalFrictionStopping * horizontalFrictionTime) + rigid2D.velocity.x;
                 }
             } else {
                 if (horizontalVelocity >= 0) {
                     horizontalVelocity = 0;
-                    timeFriction = 0;
+                    horizontalFrictionTime = 0;
                 } else {
-                    horizontalVelocity = (horizontalFriction * timeFriction) + rigid2D.velocity.x;
+                    horizontalVelocity = (horizontalFrictionStopping * horizontalFrictionTime) + rigid2D.velocity.x;
                 }
             } 
         }
