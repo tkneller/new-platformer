@@ -73,9 +73,7 @@ public class PlayerController : MonoBehaviour
     // Movement controlls
     private void Move() {
         moveInput = Input.GetAxisRaw("Horizontal");
-        //moveInput = 1;
-
-
+        
         // Acceleration
         if (moveInput != 0) {
             horizontalAccelerationTime = horizontalAccelerationTime + Time.deltaTime;
@@ -157,9 +155,13 @@ public class PlayerController : MonoBehaviour
 
     // Wall jump / slide controlls
     private void WallJump() {
-            if (onWall && !onGround &&) {
+            if (onWall && !onGround) {
                 verticalVelocity = rigid2D.velocity.y * wallSlideMultiplier;
                 rigid2D.velocity = new Vector2(rigid2D.velocity.x, verticalVelocity);
+
+                if (Input.GetButtonDown("Jump")) {
+                    rigid2D.velocity = new Vector2(10, 20);
+                }   
             }
     }
 
