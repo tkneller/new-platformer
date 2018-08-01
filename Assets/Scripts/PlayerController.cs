@@ -53,6 +53,7 @@ public class PlayerController : MonoBehaviour
 
     void Update () {
         Jump();
+        WallSlide();
         WallJump();
     }
 
@@ -65,7 +66,6 @@ public class PlayerController : MonoBehaviour
         GUI.Label(new Rect(50, 75, 300, 20), "Wall Jump: " + isWallJumping);
         GUI.Label(new Rect(50, 90, 300, 20), "Wall Slide: " + isWallSliding);
     }
-
 
     // Checks if the player is on ground
     private bool IsOnGround() {
@@ -80,8 +80,8 @@ public class PlayerController : MonoBehaviour
     // Movement controlls
     private float Move() {
         moveInput = Input.GetAxisRaw("Horizontal");
-
-        if (isWallJumping || isWallSliding) {
+      
+        if (isWallSliding) {
             return moveInput;  
         }
 
@@ -166,44 +166,70 @@ public class PlayerController : MonoBehaviour
         }
     }
 
-    // Wall jump / slide controlls
-    private void WallJump() {
+    private void WallSlide() {
         if (onWall && !onGround) {
-
             isWallSliding = true;
             isWallJumping = false;
 
-            if (isWallSliding) {
-                verticalVelocity = rigid2D.velocity.y * wallSlideMultiplier;
-                rigid2D.velocity = new Vector2(rigid2D.velocity.x, verticalVelocity);
+            verticalVelocity = rigid2D.velocity.y * wallSlideMultiplier;
+            rigid2D.velocity = new Vector2(rigid2D.velocity.x, verticalVelocity);
+        } else {
+            isWallSliding = false;
+        }        
+    }
 
-                if ((Input.GetAxisRaw("Horizontal") > 0 && !facingRight) ||
-                    (Input.GetAxisRaw("Horizontal") < 0 && facingRight)) {
-
-                    isWallSliding = false;
-                }
-
-                if (Input.GetButton("Jump")) {
-                    if (facingRight) {
-                        rigid2D.velocity = new Vector2(-(wallJumpHorizontalVelocity), wallJumpVerticalVelocity);
-                    } else {
-                        rigid2D.velocity = new Vector2(wallJumpHorizontalVelocity, wallJumpVerticalVelocity);
-                    }
+    private void WallJump() {
+        if (isWallSliding) {
+                if (facingRight && Input.GetAxis("Horizontal") == -1 && Input.GetButton("Jump")) {
+                    rigid2D.velocity = new Vector2(-(wallJumpHorizontalVelocity), wallJumpVerticalVelocity);
                     isWallSliding = false;
                     isWallJumping = true;
-                    Flip();
-                } 
-            } 
-        }
+            } else if (!facingRight && Input.GetAxis("Horizontal") == 1 && Input.GetButton("Jump")) {
+                    rigid2D.velocity = new Vector2(wallJumpHorizontalVelocity, wallJumpVerticalVelocity);
+                    isWallSliding = false;
+                    isWallJumping = true;
+            }
 
-        if (onGround) {
-            isWallSliding = false;
-            isWallJumping = false;
+                
         }
     }
 
-    // Flips the sprite according to the direction the player is facing
-    private void Flip() {
+        // Wall jump / slide controlls
+        /*
+        private void WallJump() {
+            if (onWall && !onGround) {
+
+                isWallSliding = true;
+                isWallJumping = false;
+
+                if (isWallSliding) {
+                    verticalVelocity = rigid2D.velocity.y * wallSlideMultiplier;
+                    rigid2D.velocity = new Vector2(rigid2D.velocity.x, verticalVelocity);
+
+                    if (facingRight && Input.GetAxisRaw("Horizontal") == -1 || !facingRight && Input.GetAxisRaw("Horizontal") == 1) {
+
+                        if (Input.GetButton("Jump")) {
+                            if (facingRight && Input.GetAxis("Horizontal") == -1) {
+                                rigid2D.velocity = new Vector2(-(wallJumpHorizontalVelocity), wallJumpVerticalVelocity);
+                            } else if (!facingRight && Input.GetAxis("Horizontal") == 1) {
+                                rigid2D.velocity = new Vector2(wallJumpHorizontalVelocity, wallJumpVerticalVelocity);
+                            }
+
+                            isWallSliding = false;
+                            isWallJumping = true;
+                        }
+                    }
+                }
+            }
+
+            if (onGround) {
+                isWallJumping = false;
+            }
+        }
+        */
+
+        // Flips the sprite according to the direction the player is facing
+        private void Flip() {
         facingRight = !facingRight;
         Vector3 scale = transform.localScale;
         scale.x *= -1;
