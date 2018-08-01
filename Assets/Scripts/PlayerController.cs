@@ -26,7 +26,12 @@ public class PlayerController : MonoBehaviour
     private bool onWall = false;
     public Transform wallCheck;
     public float wallCheckRadius = 0.2f;
+    public LayerMask wall;
     public float wallSlideMultiplier = 0.5f;
+    public float wallJumpHorizontalVelocity = 10f;
+    public float wallJumpVerticalVelocity = 25f;
+    public bool isWallSliding = false;
+    public bool isWallJumping = false;
 
     public float jumpVelocity = 10f;
     public float cutJumpHeight = 0.5f; 
@@ -57,6 +62,8 @@ public class PlayerController : MonoBehaviour
         
         GUI.Label(new Rect(50, 45, 300, 20), "On ground: " + onGround);
         GUI.Label(new Rect(50, 60, 300, 20), "On wall: " + onWall);
+        GUI.Label(new Rect(50, 75, 300, 20), "Wall Jump: " + isWallJumping);
+        GUI.Label(new Rect(50, 90, 300, 20), "Wall Slide: " + isWallSliding);
     }
 
 
@@ -67,13 +74,17 @@ public class PlayerController : MonoBehaviour
 
     // Checks if the player is on a wall
     private bool IsOnWall() {
-        return Physics2D.OverlapCircle(wallCheck.position, wallCheckRadius, ground);
+        return Physics2D.OverlapCircle(wallCheck.position, wallCheckRadius, wall);
     }
 
     // Movement controlls
-    private void Move() {
+    private float Move() {
         moveInput = Input.GetAxisRaw("Horizontal");
-        
+
+        if (isWallJumping) {
+            return moveInput;  
+        }
+
         // Acceleration
         if (moveInput != 0) {
             horizontalAccelerationTime = horizontalAccelerationTime + Time.deltaTime;
@@ -118,6 +129,8 @@ public class PlayerController : MonoBehaviour
         } else if (moveInput < 0 && facingRight) {
             Flip();
         }
+
+        return moveInput;
     }
 
     // Jump controlls
@@ -155,14 +168,32 @@ public class PlayerController : MonoBehaviour
 
     // Wall jump / slide controlls
     private void WallJump() {
-            if (onWall && !onGround) {
+        if (onWall && !onGround) {
+
+            if (facingRight && moveInput == 1 || !facingRight && moveInput == -1) {
+                isWallSliding = true;
+                isWallJumping = false;
+            } else {
+                isWallSliding = false;
+            }
+                
+            if (isWallSliding) {
+                isWallJumping = false;
                 verticalVelocity = rigid2D.velocity.y * wallSlideMultiplier;
                 rigid2D.velocity = new Vector2(rigid2D.velocity.x, verticalVelocity);
 
-                if (Input.GetButtonDown("Jump")) {
-                    rigid2D.velocity = new Vector2(10, 20);
-                }   
-            }
+                if (Input.GetButton("Jump")) {
+                    rigid2D.velocity = new Vector2(-1f * moveInput * (wallJumpHorizontalVelocity), wallJumpVerticalVelocity);
+                    isWallJumping = true;
+                    Flip();
+                }
+            } 
+        }
+
+        if (onGround) {
+            isWallSliding = false;
+            isWallJumping = false;
+        }
     }
 
     // Flips the sprite according to the direction the player is facing
