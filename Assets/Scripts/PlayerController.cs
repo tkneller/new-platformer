@@ -81,7 +81,7 @@ public class PlayerController : MonoBehaviour
     private float Move() {
         moveInput = Input.GetAxisRaw("Horizontal");
 
-        if (isWallJumping) {
+        if (isWallJumping || isWallSliding) {
             return moveInput;  
         }
 
@@ -170,23 +170,29 @@ public class PlayerController : MonoBehaviour
     private void WallJump() {
         if (onWall && !onGround) {
 
-            if (facingRight && moveInput == 1 || !facingRight && moveInput == -1) {
-                isWallSliding = true;
-                isWallJumping = false;
-            } else {
-                isWallSliding = false;
-            }
-                
+            isWallSliding = true;
+            isWallJumping = false;
+
             if (isWallSliding) {
-                isWallJumping = false;
                 verticalVelocity = rigid2D.velocity.y * wallSlideMultiplier;
                 rigid2D.velocity = new Vector2(rigid2D.velocity.x, verticalVelocity);
 
+                if ((Input.GetAxisRaw("Horizontal") > 0 && !facingRight) ||
+                    (Input.GetAxisRaw("Horizontal") < 0 && facingRight)) {
+
+                    isWallSliding = false;
+                }
+
                 if (Input.GetButton("Jump")) {
-                    rigid2D.velocity = new Vector2(-1f * moveInput * (wallJumpHorizontalVelocity), wallJumpVerticalVelocity);
+                    if (facingRight) {
+                        rigid2D.velocity = new Vector2(-(wallJumpHorizontalVelocity), wallJumpVerticalVelocity);
+                    } else {
+                        rigid2D.velocity = new Vector2(wallJumpHorizontalVelocity, wallJumpVerticalVelocity);
+                    }
+                    isWallSliding = false;
                     isWallJumping = true;
                     Flip();
-                }
+                } 
             } 
         }
 
