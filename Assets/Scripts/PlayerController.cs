@@ -4,6 +4,8 @@ using UnityEngine;
 
 public class PlayerController : MonoBehaviour
 {
+    private Rigidbody2D rigid2D;
+
     // Ground check
     private bool isOnGround = false;
     public Transform groundCheck;
@@ -57,7 +59,10 @@ public class PlayerController : MonoBehaviour
     public float  jumpPressedRememberTime = 0.2f;
     private bool  isJumping = false;
 
-    private Rigidbody2D rigid2D;
+    // Air stomp
+    public float airStompVelocity = 30f;
+    private bool isAirStomping = false;
+    
 
     // Start
 	void Start () {
@@ -77,6 +82,7 @@ public class PlayerController : MonoBehaviour
         Dash();
         Jump();
         AirDash();
+        AirStomp();
         WallSlide();
         WallJump();
     }
@@ -95,6 +101,7 @@ public class PlayerController : MonoBehaviour
         GUI.Label(new Rect(50, 125, 300, 20), "Jump: " + isJumping);
         GUI.Label(new Rect(50, 140, 300, 20), "Wall jump: " + isWallJumping);
         GUI.Label(new Rect(50, 155, 300, 20), "Wall slide: " + isWallSliding);
+        GUI.Label(new Rect(50, 170, 300, 20), "Air stomp: " + isAirStomping);
     }
 
     // GUI
@@ -282,6 +289,22 @@ public class PlayerController : MonoBehaviour
             isOnGroundRemember = 0;
             jumpPressedRemember = 0;
             rigid2D.velocity    = new Vector2(rigid2D.velocity.x, jumpVelocity);
+        }
+    }
+
+    // Air stomp controlls
+    private void AirStomp() {
+
+        if (isOnGround) {
+            isAirStomping = false;
+        }
+        else {
+
+            if (Input.GetAxisRaw("Vertical") == -1) {
+                isAirStomping    = true;
+                rigid2D.velocity = new Vector2(0, rigid2D.velocity.y + (-1f * airStompVelocity));
+            }
+
         }
     }
 
