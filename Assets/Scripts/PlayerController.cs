@@ -4,6 +4,20 @@ using UnityEngine;
 
 public class PlayerController : MonoBehaviour
 {
+    // Ground check
+    private bool isOnGround = false;
+    public Transform groundCheck;
+    private float groundCheckRadius = 0.2f;
+    public LayerMask ground;
+    private float isOnGroundRemember;
+    public float isOnGroundRememberTime = 0.2f;
+
+    // Wall check
+    private bool isOnWall = false;
+    public Transform wallCheck;
+    public float wallCheckRadius = 0.2f;
+    public LayerMask wall;
+
     // Movement
     private float moveInput = 0;
     private int   direction = 1;
@@ -19,23 +33,15 @@ public class PlayerController : MonoBehaviour
 
     // Dash
     public float  dashVelocity = 30f;
-    public float  dashTime = 5f;
+    public float  dashTime = 1f;
     private float dashTimer = 0;
     private bool  isDashing = false;
 
-    // Ground check
-    private bool     isOnGround = false;
-    public Transform groundCheck;
-    private float    groundCheckRadius = 0.2f;
-    public LayerMask ground;
-    private float    isOnGroundRemember;
-    public float     isOnGroundRememberTime = 0.2f;
-
-    // Wall check
-    private bool     isOnWall = false;
-    public Transform wallCheck;
-    public float     wallCheckRadius = 0.2f;
-    public LayerMask wall;
+    // Air dash
+    public float  airDashVelocity = 30f;
+    public float  airDashTime = 1f;
+    private float airDashTimer = 0;
+    private bool  isAirDashing = false;
 
     // Wall slide / jump
     public float wallSlideMultiplier = 0.5f;
@@ -50,10 +56,6 @@ public class PlayerController : MonoBehaviour
     private float jumpPressedRemember;
     public float  jumpPressedRememberTime = 0.2f;
     private bool  isJumping = false;
-
-    // Air dash
-    public float airDashVelocity = 15f;
-    private bool isAirDashing = false;
 
     private Rigidbody2D rigid2D;
 
@@ -123,9 +125,10 @@ public class PlayerController : MonoBehaviour
     // Movement controlls
     private float Move() {
         moveInput = Input.GetAxisRaw("Horizontal");
-      
-        // Deactivactivates movement when player is sliding down a wall
-        if (isWallSliding || isDashing) {
+
+        // Deactivactivates movement when player is 
+        // sliding down a wall,dashing or air dashing
+        if (isWallSliding || isDashing || isAirDashing) {
             return moveInput;  
         }
 
@@ -188,23 +191,61 @@ public class PlayerController : MonoBehaviour
     // Dash controlls
     private void Dash() {
 
-        if (isDashing) {
-            dashTimer = dashTimer + Time.deltaTime;
+        if (!isOnGround) {
+            isDashing = false;
         }
         else {
-            dashTimer = 0;
-        }
 
-        if (dashTimer < dashTime) {
-            if (Input.GetButtonDown("Dash")) {
-                isDashing = true;
-                rigid2D.velocity = new Vector2(rigid2D.velocity.x + (direction * dashVelocity), rigid2D.velocity.y);
+            if (isDashing) {
+                dashTimer = dashTimer + Time.deltaTime;
             }
-            else if (Input.GetButtonUp("Dash")) {
+            else {
+                dashTimer = 0;
+            }
+
+            if (dashTimer < dashTime) {
+
+                if (Input.GetButtonDown("Dash")) {
+                    isDashing        = true;
+                    rigid2D.velocity = new Vector2(rigid2D.velocity.x + (direction * dashVelocity), rigid2D.velocity.y);
+                }
+                else if (Input.GetButtonUp("Dash")) {
+                    isDashing = false;
+                }
+            }
+            else {
                 isDashing = false;
             }
-        } else {
-            isDashing = false;
+        }
+    }
+
+    // Air dash controlls
+    private void AirDash() {
+
+        if (isOnGround) {
+            isAirDashing = false;
+        }
+        else {
+
+            if (isAirDashing) {
+                airDashTimer = airDashTimer + Time.deltaTime;
+            }
+            else {
+                airDashTimer = 0;
+            }
+
+            if (airDashTimer < airDashTime) {
+
+                if (Input.GetButtonDown("Dash")) {
+                    isAirDashing         = true;
+                    rigid2D.gravityScale = 0;
+                    rigid2D.velocity     = new Vector2(rigid2D.velocity.x + (direction * airDashVelocity), 0);
+                }
+            }
+            else {
+                isAirDashing         = false;
+                rigid2D.gravityScale = 1;
+            }
         }
     }
 
@@ -275,20 +316,5 @@ public class PlayerController : MonoBehaviour
                 isWallJumping    = true;
             }               
         }
-    }
-
-    // Air dash controlls
-    private void AirDash() {
-        
-        if (!isOnGround) {
-
-            if (Input.GetButton("Dash") && isAirDashing == false) {
-                rigid2D.velocity = new Vector2(rigid2D.velocity.x + airDashVelocity, 0);
-                isAirDashing     = true;
-            }
-        }
-        else {
-            isAirDashing = false;
-        } 
     }
 }
