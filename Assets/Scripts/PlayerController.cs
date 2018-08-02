@@ -6,47 +6,51 @@ public class PlayerController : MonoBehaviour
 {
     // Movement
     private float moveInput = 0;
-    private int direction = 1;
-    public float horizontalVelocityMax = 10f;
+    private int   direction = 1;
+    public float  horizontalVelocityMax = 10f;
     private float horizontalVelocity;
     private float verticalVelocity = 0;
-    public float horizontalAcceleration = 0.5f;
+    public float  horizontalAcceleration = 0.5f;
     private float horizontalAccelerationTime = 0;
-    public float horizontalFriction = 0.2f;
+    public float  horizontalFriction = 0.2f;
     private float horizontalFrictionTime = 0;
-    public float horizontalFrictionStopping = 0.2f;
-    public float horizontalFrictionTurning = 0.2f;
-    
+    public float  horizontalFrictionStopping = 0.2f;
+    public float  horizontalFrictionTurning = 0.2f;
+
+    // Dash
+    private bool isDashing = false;
+
     // Ground check
-    private bool onGround = false;
+    private bool     isOnGround = false;
     public Transform groundCheck;
-    private float groundCheckRadius = 0.2f;
+    private float    groundCheckRadius = 0.2f;
     public LayerMask ground;
-    private float onGroundRemember;
-    public float onGroundRememberTime = 0.2f;
+    private float    isOnGroundRemember;
+    public float     isOnGroundRememberTime = 0.2f;
 
     // Wall check
-    private bool onWall = false;
+    private bool     isOnWall = false;
     public Transform wallCheck;
-    public float wallCheckRadius = 0.2f;
+    public float     wallCheckRadius = 0.2f;
     public LayerMask wall;
 
     // Wall slide / jump
     public float wallSlideMultiplier = 0.5f;
     public float wallJumpHorizontalVelocity = 10f;
     public float wallJumpVerticalVelocity = 25f;
-    public bool isWallSliding = false;
-    public bool isWallJumping = false;
+    public bool  isWallSliding = false;
+    public bool  isWallJumping = false;
 
     // Jump
-    public float jumpVelocity = 10f;
-    public float cutJumpHeight = 0.5f; 
+    public float  jumpVelocity = 10f;
+    public float  cutJumpHeight = 0.5f; 
     private float jumpPressedRemember;
-    public float jumpPressedRememberTime = 0.2f;
+    public float  jumpPressedRememberTime = 0.2f;
+    private bool  isJumping = false;
 
     // Air dash
     public float airDashVelocity = 15f;
-    private bool airDash = false;
+    private bool isAirDashing = false;
 
     private Rigidbody2D rigid2D;
 
@@ -55,8 +59,8 @@ public class PlayerController : MonoBehaviour
     }
 
     void FixedUpdate() {
-        onGround = IsOnGround();
-        onWall = IsOnWall();
+        isOnGround = IsOnGround();
+        isOnWall = IsOnWall();
 
         Move();
     }
@@ -73,12 +77,16 @@ public class PlayerController : MonoBehaviour
         // Debug output
         GUI.Label(new Rect(50, 10, 300, 20), "Horizontal velocity: " + rigid2D.velocity.x);
         GUI.Label(new Rect(50, 25, 300, 20), "Vertical velocity: " + rigid2D.velocity.y);
-        
-        GUI.Label(new Rect(50, 45, 300, 20), "On ground: " + onGround);
-        GUI.Label(new Rect(50, 60, 300, 20), "On wall: " + onWall);
+        GUI.Label(new Rect(50, 40, 300, 20), "direction: " + direction);
 
-        GUI.Label(new Rect(50, 75, 300, 20), "Wall jump: " + isWallJumping);
-        GUI.Label(new Rect(50, 90, 300, 20), "Wall slide: " + isWallSliding);
+        GUI.Label(new Rect(50, 60, 300, 20), "On ground: " + isOnGround);
+        GUI.Label(new Rect(50, 75, 300, 20), "On wall: " + isOnWall);
+
+        GUI.Label(new Rect(50, 95, 300, 20), "Dash: " + isDashing);
+        GUI.Label(new Rect(50, 110, 300, 20), "Air Dash: " + isAirDashing);
+        GUI.Label(new Rect(50, 125, 300, 20), "Jump: " + isJumping);
+        GUI.Label(new Rect(50, 140, 300, 20), "Wall jump: " + isWallJumping);
+        GUI.Label(new Rect(50, 155, 300, 20), "Wall slide: " + isWallSliding);
     }
 
     // Checks if the player is colliding with ground
@@ -105,7 +113,9 @@ public class PlayerController : MonoBehaviour
         // Acceleration
         if (moveInput != 0) {
             horizontalAccelerationTime = horizontalAccelerationTime + Time.deltaTime;
-            horizontalVelocity = (horizontalAcceleration - horizontalFriction) * (horizontalAccelerationTime * moveInput) + rigid2D.velocity.x;
+            horizontalVelocity         = (horizontalAcceleration - horizontalFriction) 
+                                       * (horizontalAccelerationTime * moveInput) 
+                                       + rigid2D.velocity.x;
         }
         else {
             horizontalAccelerationTime = 0;
@@ -123,8 +133,8 @@ public class PlayerController : MonoBehaviour
 
             if (direction == 1) {
 
-                if (horizontalVelocity <= 0) {
-                    horizontalVelocity = 0;
+                if (horizontalVelocity    <= 0) {
+                    horizontalVelocity     = 0;
                     horizontalFrictionTime = 0;
                 }
                 else {
@@ -134,7 +144,7 @@ public class PlayerController : MonoBehaviour
             else {
 
                 if (horizontalVelocity >= 0) {
-                    horizontalVelocity = 0;
+                    horizontalVelocity     = 0;
                     horizontalFrictionTime = 0;
                 }
                 else {
@@ -164,11 +174,12 @@ public class PlayerController : MonoBehaviour
     // Jump controlls
     private void Jump() {
         // The player is able to jump nethertheless he is falling from a ledge,
-        // if he is in the specified time period, defined in onGroundRememberTime
-        onGroundRemember -= Time.deltaTime;
+        // if he is in the specified time period, defined in isOnGroundRememberTime
+        isOnGroundRemember -= Time.deltaTime;
 
-        if (onGround) {
-            onGroundRemember = onGroundRememberTime;
+        if (isOnGround) {
+            isJumping          = false;
+            isOnGroundRemember = isOnGroundRememberTime;
         }
 
         // The player is able to jump nethertheless he is shortly above the ground,
@@ -182,23 +193,24 @@ public class PlayerController : MonoBehaviour
         // Determines how high the player will jump depending on how long
         // the jump button is held down
         if (Input.GetButtonUp("Jump")) {
+            isJumping = true;
 
             if (rigid2D.velocity.y > 0) {
                 rigid2D.velocity = new Vector2(rigid2D.velocity.x, rigid2D.velocity.y * cutJumpHeight);
             }
         }
 
-        if (jumpPressedRemember > 0 && onGroundRemember > 0) {
-            onGroundRemember = 0;
+        if (jumpPressedRemember > 0 && isOnGroundRemember > 0) {
+            isOnGroundRemember  = 0;
             jumpPressedRemember = 0;
-            rigid2D.velocity = new Vector2(rigid2D.velocity.x, jumpVelocity);
+            rigid2D.velocity    = new Vector2(rigid2D.velocity.x, jumpVelocity);
         }
     }
 
     // Wall slide controlls
     private void WallSlide() {
 
-        if (onWall && !onGround) {
+        if (isOnWall && !isOnGround) {
             isWallSliding = true;
             isWallJumping = false;
 
@@ -217,13 +229,13 @@ public class PlayerController : MonoBehaviour
 
             if (direction == 1 && Input.GetAxis("Horizontal") == -1 && Input.GetButton("Jump")) {
                 rigid2D.velocity = new Vector2(-(wallJumpHorizontalVelocity), wallJumpVerticalVelocity);
-                isWallSliding = false;
-                isWallJumping = true;
+                isWallSliding    = false;
+                isWallJumping    = true;
             } 
             else if (direction == -1 && Input.GetAxis("Horizontal") == 1 && Input.GetButton("Jump")) {
                 rigid2D.velocity = new Vector2(wallJumpHorizontalVelocity, wallJumpVerticalVelocity);
-                isWallSliding = false;
-                isWallJumping = true;
+                isWallSliding    = false;
+                isWallJumping    = true;
             }               
         }
     }
@@ -231,15 +243,15 @@ public class PlayerController : MonoBehaviour
     // Air dash controlls
     private void AirDash() {
         
-        if (!onGround) {
+        if (!isOnGround) {
 
-            if (Input.GetButton("Dash") && airDash == false) {
+            if (Input.GetButton("Dash") && isAirDashing == false) {
                 rigid2D.velocity = new Vector2(rigid2D.velocity.x + airDashVelocity, 0);
-                airDash = true;
+                isAirDashing     = true;
             }
         }
         else {
-            airDash = false;
+            isAirDashing = false;
         } 
     }
 
