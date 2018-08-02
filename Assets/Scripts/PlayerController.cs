@@ -206,8 +206,6 @@ public class PlayerController : MonoBehaviour
         } else {
             isDashing = false;
         }
-
-
     }
 
     // Jump controlls
@@ -232,15 +230,15 @@ public class PlayerController : MonoBehaviour
         // Determines how high the player will jump depending on how long
         // the jump button is held down
         if (Input.GetButtonUp("Jump")) {
-            isJumping = true;
-
+            
             if (rigid2D.velocity.y > 0) {
                 rigid2D.velocity = new Vector2(rigid2D.velocity.x, rigid2D.velocity.y * cutJumpHeight);
             }
         }
 
         if (jumpPressedRemember > 0 && isOnGroundRemember > 0) {
-            isOnGroundRemember  = 0;
+            isJumping = true;
+            isOnGroundRemember = 0;
             jumpPressedRemember = 0;
             rigid2D.velocity    = new Vector2(rigid2D.velocity.x, jumpVelocity);
         }
