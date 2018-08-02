@@ -18,7 +18,10 @@ public class PlayerController : MonoBehaviour
     public float  horizontalFrictionTurning = 0.2f;
 
     // Dash
-    private bool isDashing = false;
+    public float  dashVelocity = 30f;
+    public float  dashTime = 0.5f;
+    private float dashTimer = 0;
+    private bool  isDashing = false;
 
     // Ground check
     private bool     isOnGround = false;
@@ -54,10 +57,12 @@ public class PlayerController : MonoBehaviour
 
     private Rigidbody2D rigid2D;
 
+    // Start
 	void Start () {
         rigid2D = GetComponent<Rigidbody2D>();
     }
 
+    // Fixed Update
     void FixedUpdate() {
         isOnGround = IsOnGround();
         isOnWall = IsOnWall();
@@ -65,6 +70,7 @@ public class PlayerController : MonoBehaviour
         Move();
     }
 
+    // Update
     void Update () {
         Dash();
         Jump();
@@ -73,8 +79,8 @@ public class PlayerController : MonoBehaviour
         WallJump();
     }
 
-    void OnGUI() {
-        // Debug output
+    // Debug Output
+    void DebugOutput() {
         GUI.Label(new Rect(50, 10, 300, 20), "Horizontal velocity: " + rigid2D.velocity.x);
         GUI.Label(new Rect(50, 25, 300, 20), "Vertical velocity: " + rigid2D.velocity.y);
         GUI.Label(new Rect(50, 40, 300, 20), "direction: " + direction);
@@ -87,6 +93,11 @@ public class PlayerController : MonoBehaviour
         GUI.Label(new Rect(50, 125, 300, 20), "Jump: " + isJumping);
         GUI.Label(new Rect(50, 140, 300, 20), "Wall jump: " + isWallJumping);
         GUI.Label(new Rect(50, 155, 300, 20), "Wall slide: " + isWallSliding);
+    }
+
+    // GUI
+    void OnGUI() {
+        DebugOutput();
     }
 
     // Checks if the player is colliding with ground
