@@ -1,6 +1,7 @@
 ﻿using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
+using EZCameraShake;
 
 public class PlayerController : MonoBehaviour
 {
@@ -85,6 +86,16 @@ public class PlayerController : MonoBehaviour
         AirStomp();
         WallSlide();
         WallJump();
+
+        Test();
+    }
+
+    // Test
+    private void Test() {
+        
+        if (Input.GetButtonDown("Test")) {
+            CameraShaker.Instance.ShakeOnce(4f, 4f, .1f, 1f);
+        }
     }
 
     // Debug Output
