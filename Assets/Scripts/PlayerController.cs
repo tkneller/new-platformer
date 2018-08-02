@@ -63,7 +63,7 @@ public class PlayerController : MonoBehaviour
     // Air stomp
     public float airStompVelocity = 30f;
     private bool isAirStomping = false;
-    
+    private bool isAirStompLanding = false;
 
     // Start
 	void Start () {
@@ -92,10 +92,7 @@ public class PlayerController : MonoBehaviour
 
     // Test
     private void Test() {
-        
-        if (Input.GetButtonDown("Test")) {
-            CameraShaker.Instance.ShakeOnce(4f, 4f, .1f, 1f);
-        }
+       
     }
 
     // Debug Output
@@ -307,13 +304,19 @@ public class PlayerController : MonoBehaviour
     private void AirStomp() {
 
         if (isOnGround) {
+            if (isAirStompLanding) {
+                CameraShaker.Instance.ShakeOnce(4f, 4f, .1f, 1f);
+            }
+
+            isAirStompLanding = false;
             isAirStomping = false;
         }
         else {
 
             if (Input.GetAxisRaw("Vertical") == -1) {
-                isAirStomping    = true;
-                rigid2D.velocity = new Vector2(0, rigid2D.velocity.y + (-1f * airStompVelocity));
+                isAirStomping     = true;
+                isAirStompLanding = true;
+                rigid2D.velocity  = new Vector2(0, rigid2D.velocity.y + (-1f * airStompVelocity));
             }
 
         }
