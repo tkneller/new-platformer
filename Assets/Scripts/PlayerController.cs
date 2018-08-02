@@ -19,7 +19,7 @@ public class PlayerController : MonoBehaviour
 
     // Dash
     public float  dashVelocity = 30f;
-    public float  dashTime = 0.5f;
+    public float  dashTime = 5f;
     private float dashTimer = 0;
     private bool  isDashing = false;
 
@@ -125,7 +125,7 @@ public class PlayerController : MonoBehaviour
         moveInput = Input.GetAxisRaw("Horizontal");
       
         // Deactivactivates movement when player is sliding down a wall
-        if (isWallSliding) {
+        if (isWallSliding || isDashing) {
             return moveInput;  
         }
 
@@ -187,6 +187,26 @@ public class PlayerController : MonoBehaviour
 
     // Dash controlls
     private void Dash() {
+
+        if (isDashing) {
+            dashTimer = dashTimer + Time.deltaTime;
+        }
+        else {
+            dashTimer = 0;
+        }
+
+        if (dashTimer < dashTime) {
+            if (Input.GetButtonDown("Dash")) {
+                isDashing = true;
+                rigid2D.velocity = new Vector2(rigid2D.velocity.x + (direction * dashVelocity), rigid2D.velocity.y);
+            }
+            else if (Input.GetButtonUp("Dash")) {
+                isDashing = false;
+            }
+        } else {
+            isDashing = false;
+        }
+
 
     }
 
