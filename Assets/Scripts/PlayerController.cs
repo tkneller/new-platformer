@@ -6,7 +6,7 @@ public class PlayerController : MonoBehaviour
 {
     // Movement
     private float moveInput = 0;
-    private bool facingRight = true;
+    private int direction = 1;
     public float horizontalVelocityMax = 10f;
     private float horizontalVelocity;
     private float verticalVelocity = 0;
@@ -62,6 +62,7 @@ public class PlayerController : MonoBehaviour
     }
 
     void Update () {
+        Dash();
         Jump();
         AirDash();
         WallSlide();
@@ -76,10 +77,8 @@ public class PlayerController : MonoBehaviour
         GUI.Label(new Rect(50, 45, 300, 20), "On ground: " + onGround);
         GUI.Label(new Rect(50, 60, 300, 20), "On wall: " + onWall);
 
-        GUI.Label(new Rect(50, 80, 300, 20), "Wall jump: " + isWallJumping);
-        GUI.Label(new Rect(50, 95, 300, 20), "Wall slide: " + isWallSliding);
-
-        GUI.Label(new Rect(50, 115, 300, 20), "Air dash: " + isWallSliding);
+        GUI.Label(new Rect(50, 75, 300, 20), "Wall jump: " + isWallJumping);
+        GUI.Label(new Rect(50, 90, 300, 20), "Wall slide: " + isWallSliding);
     }
 
     // Checks if the player is colliding with ground
@@ -122,7 +121,7 @@ public class PlayerController : MonoBehaviour
 
             horizontalFrictionTime = horizontalFrictionTime + Time.deltaTime;
 
-            if (facingRight) {
+            if (direction == 1) {
 
                 if (horizontalVelocity <= 0) {
                     horizontalVelocity = 0;
@@ -147,14 +146,19 @@ public class PlayerController : MonoBehaviour
         rigid2D.velocity = new Vector2(horizontalVelocity, rigid2D.velocity.y);
 
         // Flip sprite according to the direction the player is facing
-        if (moveInput > 0 && !facingRight) {
+        if (moveInput > 0 && direction == -1) {
             Flip();
         }
-        else if (moveInput < 0 && facingRight) {
+        else if (moveInput < 0 && direction == 1) {
             Flip();
         }
 
         return moveInput;
+    }
+
+    // Dash controlls
+    private void Dash() {
+
     }
 
     // Jump controlls
@@ -211,12 +215,12 @@ public class PlayerController : MonoBehaviour
 
         if (isWallSliding) {
 
-            if (facingRight && Input.GetAxis("Horizontal") == -1 && Input.GetButton("Jump")) {
+            if (direction == 1 && Input.GetAxis("Horizontal") == -1 && Input.GetButton("Jump")) {
                 rigid2D.velocity = new Vector2(-(wallJumpHorizontalVelocity), wallJumpVerticalVelocity);
                 isWallSliding = false;
                 isWallJumping = true;
             } 
-            else if (!facingRight && Input.GetAxis("Horizontal") == 1 && Input.GetButton("Jump")) {
+            else if (direction == -1 && Input.GetAxis("Horizontal") == 1 && Input.GetButton("Jump")) {
                 rigid2D.velocity = new Vector2(wallJumpHorizontalVelocity, wallJumpVerticalVelocity);
                 isWallSliding = false;
                 isWallJumping = true;
@@ -241,9 +245,9 @@ public class PlayerController : MonoBehaviour
 
     // Flips the sprite according to the direction the player is facing
     private void Flip() {
-        facingRight = !facingRight;
-        Vector3 scale = transform.localScale;
-        scale.x *= -1;
-        transform.localScale = scale;
+        direction             = -1 * (int)Mathf.Sign(direction);
+        Vector3 scale         = transform.localScale;
+        scale.x              *= -1;
+        transform.localScale  = scale;
     }
 }
