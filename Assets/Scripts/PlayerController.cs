@@ -101,6 +101,14 @@ public class PlayerController : MonoBehaviour
         return Physics2D.OverlapCircle(wallCheck.position, wallCheckRadius, wall);
     }
 
+    // Flips the sprite according to the direction the player is facing
+    private void Flip() {
+        direction = -1 * (int)Mathf.Sign(direction);
+        Vector3 scale = transform.localScale;
+        scale.x *= -1;
+        transform.localScale = scale;
+    }
+
     // Movement controlls
     private float Move() {
         moveInput = Input.GetAxisRaw("Horizontal");
@@ -253,13 +261,5 @@ public class PlayerController : MonoBehaviour
         else {
             isAirDashing = false;
         } 
-    }
-
-    // Flips the sprite according to the direction the player is facing
-    private void Flip() {
-        direction             = -1 * (int)Mathf.Sign(direction);
-        Vector3 scale         = transform.localScale;
-        scale.x              *= -1;
-        transform.localScale  = scale;
     }
 }
