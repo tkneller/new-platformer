@@ -24,16 +24,9 @@ public class PlayerController : MonoBehaviour
     // Movement
     private float moveInput = 0;
     private int   direction = 1;
-    public float  horizontalVelocityMax = 10f;
-    private float horizontalVelocity;
+    public float walkSpeed = 15f;
     private float verticalVelocity = 0;
-    public float  horizontalAcceleration = 0.5f;
-    private float horizontalAccelerationTime = 0;
-    public float  horizontalFriction = 0.2f;
-    private float horizontalFrictionTime = 0;
-    public float  horizontalFrictionStopping = 0.2f;
-    public float  horizontalFrictionTurning = 0.2f;
-
+   
     // Dash
     public float  dashVelocity = 30f;
     public float  dashTime = 1f;
@@ -89,7 +82,6 @@ public class PlayerController : MonoBehaviour
         WallSlide();
         WallJump();
         
-
         Test();
     }
 
@@ -140,60 +132,12 @@ public class PlayerController : MonoBehaviour
         transform.localScale = scale;
     }
 
-    // Movement controlls
-    private float Move() {
-        moveInput = Input.GetAxisRaw("Horizontal");
-
-        // Deactivactivates movement when player is 
-        // sliding down a wall,dashing or air dashing
-        if (isWallSliding || isDashing || isAirDashing) {
-            return moveInput;  
+    private void Move() {
+        
+        if (!isWallSliding && !isDashing && !isAirDashing) {
+            moveInput = Input.GetAxisRaw("Horizontal");
+            rigid2D.velocity = new Vector2(walkSpeed * moveInput, rigid2D.velocity.y);
         }
-
-        // Acceleration
-        if (moveInput != 0) {
-            horizontalAccelerationTime = horizontalAccelerationTime + Time.deltaTime;
-            horizontalVelocity         = (horizontalAcceleration - horizontalFriction) 
-                                       * (horizontalAccelerationTime * moveInput) 
-                                       + rigid2D.velocity.x;
-        }
-        else {
-            horizontalAccelerationTime = 0;
-        }
-
-        // Speedcap
-        if (moveInput * horizontalVelocity > horizontalVelocityMax) {
-            horizontalVelocity = moveInput * horizontalVelocityMax;
-        }
-
-        // Stopping
-        if (Mathf.Abs(moveInput) < 0.01f) {
-
-            horizontalFrictionTime = horizontalFrictionTime + Time.deltaTime;
-
-            if (direction == 1) {
-
-                if (horizontalVelocity    <= 0) {
-                    horizontalVelocity     = 0;
-                    horizontalFrictionTime = 0;
-                }
-                else {
-                    horizontalVelocity = -(horizontalFrictionStopping * horizontalFrictionTime) + rigid2D.velocity.x;
-                }
-            }
-            else {
-
-                if (horizontalVelocity >= 0) {
-                    horizontalVelocity     = 0;
-                    horizontalFrictionTime = 0;
-                }
-                else {
-                    horizontalVelocity = (horizontalFrictionStopping * horizontalFrictionTime) + rigid2D.velocity.x;
-                }
-            }
-        }   
-
-        rigid2D.velocity = new Vector2(horizontalVelocity, rigid2D.velocity.y);
 
         // Flip sprite according to the direction the player is facing
         if (moveInput > 0 && direction == -1) {
@@ -202,10 +146,8 @@ public class PlayerController : MonoBehaviour
         else if (moveInput < 0 && direction == 1) {
             Flip();
         }
-
-        return moveInput;
     }
-
+    
     // Dash controlls
     private void Dash() {
 
