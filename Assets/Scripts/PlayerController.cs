@@ -59,6 +59,8 @@ public class PlayerController : MonoBehaviour
     private float jumpPressedRemember;
     public float  jumpPressedRememberTime = 0.2f;
     private bool  isJumping = false;
+    public GameObject playerLanding;
+    private bool  jumpSpawnParticle = false;
 
     // Air stomp
     public float airStompVelocity = 30f;
@@ -86,6 +88,7 @@ public class PlayerController : MonoBehaviour
         AirStomp();
         WallSlide();
         WallJump();
+        
 
         Test();
     }
@@ -273,6 +276,13 @@ public class PlayerController : MonoBehaviour
         if (isOnGround) {
             isJumping          = false;
             isOnGroundRemember = isOnGroundRememberTime;
+
+            if (jumpSpawnParticle) {
+                Instantiate(playerLanding, groundCheck.position, Quaternion.identity);
+                jumpSpawnParticle = false;
+            }
+        } else {
+            jumpSpawnParticle = true;
         }
 
         // The player is able to jump nethertheless he is shortly above the ground,
@@ -354,4 +364,5 @@ public class PlayerController : MonoBehaviour
             }               
         }
     }
+
 }
