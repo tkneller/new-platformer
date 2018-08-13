@@ -7,58 +7,73 @@ public class PlayerController : MonoBehaviour
 {
     private Rigidbody2D rigid2D;
 
-    // Ground check
-    private bool isOnGround = false;
+    [Header("Ground Check")]
+    public float     isOnGroundRememberTime = 0.2f;
     public Transform groundCheck;
-    private float groundCheckRadius = 0.2f;
     public LayerMask ground;
-    private float isOnGroundRemember;
-    public float isOnGroundRememberTime = 0.2f;
+    private bool     isOnGround = false;
+    private float    groundCheckRadius = 0.2f;
+    private float    isOnGroundRemember;
 
-    // Wall check
-    private bool isOnWall = false;
+    [Space(10)]
+
+    [Header("Wall Check")]
     public Transform wallCheck;
-    public float wallCheckRadius = 0.2f;
+    public float     wallCheckRadius = 0.2f;
     public LayerMask wall;
+    private bool     isOnWall = false;
 
-    // Movement
+    [Space(10)]
+
+    [Header("Movement")]
+    public float  walkSpeed = 15f;
     private float moveInput = 0;
     private int   direction = 1;
-    public float walkSpeed = 15f;
     private float verticalVelocity = 0;
-   
-    // Dash
+
+    [Space(10)]
+
+    [Header("Dash")]
     public float  dashVelocity = 30f;
     public float  dashTime = 1f;
     private float dashTimer = 0;
     private bool  isDashing = false;
 
-    // Air dash
+    [Space(10)]
+
+    [Header("Air Dash")]
     public float  airDashVelocity = 30f;
     public float  airDashTime = 1f;
     private float airDashTimer = 0;
     private bool  isAirDashing = false;
 
-    // Wall slide / jump
+    [Space(10)]
+
+    [Header("Wall Slide / Jump")]
     public float wallSlideMultiplier = 0.5f;
     public float wallJumpHorizontalVelocity = 10f;
     public float wallJumpVerticalVelocity = 25f;
-    public bool  isWallSliding = false;
-    public bool  isWallJumping = false;
+    private bool isWallSliding = false;
+    private bool isWallJumping = false;
 
-    // Jump
-    public float  jumpVelocity = 10f;
-    public float  cutJumpHeight = 0.5f; 
-    private float jumpPressedRemember;
-    public float  jumpPressedRememberTime = 0.2f;
-    private bool  isJumping = false;
+    [Space(10)]
+
+    [Header("Jump")]
+    public float      jumpVelocity = 10f;
+    public float      cutJumpHeight = 0.5f; 
+    private float     jumpPressedRemember;
+    public float      jumpPressedRememberTime = 0.2f;
+    private bool      isJumping = false;
     public GameObject playerLanding;
-    private bool  jumpSpawnParticle = false;
+    private bool      jumpSpawnParticle = false;
 
-    // Air stomp
+    [Space(10)]
+
+    [Header("Air Stomp")]
     public float airStompVelocity = 30f;
     private bool isAirStomping = false;
     private bool isAirStompLanding = false;
+
 
     // Start
 	void Start () {
